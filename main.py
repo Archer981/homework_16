@@ -95,6 +95,30 @@ def users_page():
         return 'Пользователь записан'
 
 
+@app.route('/users/<int:user_id>', methods=['GET', 'PUT', 'DELETE'])
+def user_page(user_id):
+    if request.method == 'GET':
+        user = User.query.get(user_id).to_dict()
+        return jsonify(user)
+    elif request.method == 'PUT':
+        user = json.loads(request.data)
+        user_updated = User.query.get(user_id)
+        user_updated.first_name = user['first_name']
+        user_updated.last_name = user['last_name']
+        user_updated.age = user['age']
+        user_updated.email = user['email']
+        user_updated.role = user['role']
+        user_updated.phone = user['phone']
+        db.session.add(user_updated)
+        db.session.commit()
+        return 'Пользователь изменен'
+    elif request.method == 'DELETE':
+        user = User.query.get(user_id)
+        db.session.delete(user)
+        db.session.commit()
+        return 'Пользователь удален'
+
+
 @app.route('/orders', methods=['GET', 'POST'])
 def orders_page():
     if request.method == 'GET':
@@ -111,6 +135,32 @@ def orders_page():
         return 'Заказ записан'
 
 
+@app.route('/orders/<int:order_id>', methods=['GET', 'PUT', 'DELETE'])
+def order_page(order_id):
+    if request.method == 'GET':
+        order = Order.query.get(order_id).to_dict()
+        return jsonify(order)
+    elif request.method == 'PUT':
+        order = json.loads(request.data)
+        order_updated = Order.query.get(order_id)
+        order_updated.name = order['name']
+        order_updated.description = order['description']
+        order_updated.start_date = datetime.strptime(order['start_date'], '%m/%d/%Y').date()
+        order_updated.end_date = datetime.strptime(order['end_date'], '%m/%d/%Y').date()
+        order_updated.address = order['address']
+        order_updated.price = order['price']
+        order_updated.customer_id = order['customer_id']
+        order_updated.executor_id = order['executor_id']
+        db.session.add(order_updated)
+        db.session.commit()
+        return 'Заказ изменен'
+    elif request.method == 'DELETE':
+        order = Order.query.get(order_id)
+        db.session.delete(order)
+        db.session.commit()
+        return 'Заказ удален'
+
+
 @app.route('/offers', methods=['GET', 'POST'])
 def offers_page():
     if request.method == 'GET':
@@ -125,7 +175,24 @@ def offers_page():
         return 'Предложение записано'
 
 
-
+@app.route('/offers/<int:offer_id>', methods=['GET', 'PUT', 'DELETE'])
+def offer_page(offer_id):
+    if request.method == 'GET':
+        offer = Offer.query.get(offer_id).to_dict()
+        return jsonify(offer)
+    elif request.method == 'PUT':
+        offer = json.loads(request.data)
+        offer_updated = Offer.query.get(offer_id)
+        offer_updated.order_id = offer['order_id']
+        offer_updated.executor_id = offer['executor_id']
+        db.session.add(offer_updated)
+        db.session.commit()
+        return 'Запрос изменен'
+    elif request.method == 'DELETE':
+        offer = Offer.query.get(offer_id)
+        db.session.delete(offer)
+        db.session.commit()
+        return 'Запрос удален'
 
 
 if __name__ == '__main__':
